@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiles & Sanitary ERP - Standalone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0f172a] text-white flex flex-col hidden md:flex">
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-xl">T</div>
+            <span class="text-xl font-bold tracking-tight">TilesERP</span>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-xl text-white"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl"><i class="fas fa-box"></i> Inventory</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl"><i class="fas fa-shopping-cart"></i> Sales</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl"><i class="fas fa-truck"></i> Purchase</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl"><i class="fas fa-file-alt"></i> Reports</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b flex items-center justify-between px-8">
+            <h2 class="text-lg font-semibold text-slate-700">Sales Entry & ERP</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-sm font-bold">Bijoy Mahmud</p>
+                    <p class="text-xs text-slate-400">Admin</p>
+                </div>
+                <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold">BM</div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+            
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Today's Sales</p>
+                    <p class="text-2xl font-bold mt-1">৳45,000</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-600">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Collection</p>
+                    <p class="text-2xl font-bold mt-1">৳40,000</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-red-600">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Due</p>
+                    <p class="text-2xl font-bold mt-1">৳5,000</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-600">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Low Stock</p>
+                    <p class="text-2xl font-bold mt-1">12 Items</p>
+                </div>
+            </div>
+
+            <!-- Sales Entry Form -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 text-slate-800">
+                    <i class="fas fa-calculator text-blue-600"></i> New Sales Entry
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Form Fields -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-2">Customer Name</label>
+                            <input type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-2">Select Product</label>
+                            <select class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none">
+                                <option>White Marble Tile (60x60 cm)</option>
+                                <option>Ceramic Floor Tile (40x40 cm)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-2">Number of Boxes</label>
+                                <input type="number" id="boxes" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none font-bold text-lg" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-2">Pcs per Box</label>
+                                <input type="number" id="pcs" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none font-bold text-lg" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculation & Payment -->
+                    <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-4">Live Calculation</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-600 font-medium">Total Area:</span>
+                                <span class="text-4xl font-black text-blue-600"><span id="totalSft">0.00</span> <small class="text-sm font-normal text-slate-400">SFT</small></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 space-y-4">
+                            <label class="block text-sm font-semibold text-slate-600">Payment Method</label>
+                            <div class="flex gap-3">
+                                <button class="flex-1 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-xl font-bold">Cash</button>
+                                <button class="flex-1 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-500">Bkash</button>
+                                <button class="flex-1 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-500">Bank</button>
+                            </div>
+                            <button onclick="window.print()" class="w-full py-4 bg-[#0f172a] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all">
+                                <i class="fas fa-print"></i> Print Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const boxesInput = document.getElementById('boxes');
+        const pcsInput = document.getElementById('pcs');
+        const totalSftDisplay = document.getElementById('totalSft');
+        const sftPerPc = 3.875; // Example factor for 60x60cm
+
+        function updateCalculation() {
+            const boxes = parseFloat(boxesInput.value) || 0;
+            const pcs = parseFloat(pcsInput.value) || 0;
+            const total = boxes * pcs * sftPerPc;
+            totalSftDisplay.innerText = total.toFixed(2);
+        }
+
+        boxesInput.addEventListener('input', updateCalculation);
+        pcsInput.addEventListener('input', updateCalculation);
+    </script>
+</body>
+</html>
