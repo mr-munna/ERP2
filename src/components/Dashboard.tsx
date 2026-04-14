@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Package, ShoppingCart, TrendingUp, AlertCircle } from 'lucide-react';
+import { Package, ShoppingCart, TrendingUp, AlertCircle, DollarSign, Activity } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -9,6 +9,12 @@ export default function Dashboard() {
     todayCollection: 0,
     totalDue: 0,
     lowStock: 0
+  });
+  const [pnl, setPnl] = useState({
+    totalSales: 0,
+    totalExpenses: 0,
+    cogs: 0,
+    netProfit: 0
   });
   const [chartData, setChartData] = useState<any[]>([]);
 
@@ -20,6 +26,16 @@ export default function Dashboard() {
         setStats(data);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
+      }
+    };
+
+    const fetchPnl = async () => {
+      try {
+        const response = await fetch('/api/analytics/pnl');
+        const data = await response.json();
+        setPnl(data);
+      } catch (error) {
+        console.error('Error fetching P&L stats:', error);
       }
     };
 
@@ -38,6 +54,7 @@ export default function Dashboard() {
     };
 
     fetchStats();
+    fetchPnl();
     fetchSalesData();
   }, []);
 
@@ -82,6 +99,36 @@ export default function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">{stats.lowStock} Items</div>
             <p className="text-xs text-slate-400 mt-1">Requires reorder</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-slate-50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-slate-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">৳{pnl.totalSales.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-slate-50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">Total Expenses & COGS</CardTitle>
+            <Activity className="h-4 w-4 text-slate-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">৳{(pnl.totalExpenses + pnl.cogs).toLocaleString()}</div>
+          </CardContent>
+        </Card>
+        <Card className={`text-white ${pnl.netProfit >= 0 ? 'bg-emerald-600' : 'bg-rose-600'}`}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-white/90">Net Profit</CardTitle>
+            <TrendingUp className="h-4 w-4 text-white/90" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">৳{pnl.netProfit.toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>

@@ -2,19 +2,23 @@ import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Package, Upload } from 'lucide-react';
+import { Search, Plus, Package, Upload, ScanLine } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import BarcodeScanner from './BarcodeScanner';
 
 export default function Inventory() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // New Product State
   const [newProduct, setNewProduct] = useState({
     name: '',
+    barcode: '',
     category: 'Tiles',
     brand: '',
     size: '',
@@ -42,6 +46,11 @@ export default function Inventory() {
   }, []);
 
   const handleAddProduct = async () => {
+    if (!newProduct.name) {
+      alert('Product Name is required!');
+      return;
+    }
+
     try {
       const response = await fetch('/api/products', {
         method: 'POST',
@@ -53,12 +62,15 @@ export default function Inventory() {
           sft_per_pc: parseFloat(newProduct.sft_per_pc) || 0
         }),
       });
+      
       const result = await response.json();
+      
       if (result.success) {
         alert('Product added successfully!');
         fetchProducts();
         setNewProduct({
           name: '',
+          barcode: '',
           category: 'Tiles',
           brand: '',
           size: '',
@@ -68,9 +80,13 @@ export default function Inventory() {
           sft_per_pc: '',
           warehouse_location: ''
         });
+        setIsAddDialogOpen(false);
+      } else {
+        alert('Failed to add product: ' + result.error);
       }
     } catch (error) {
-      alert('Error adding product');
+      alert('Error adding product. Please check your connection.');
+      console.error(error);
     }
   };
 
@@ -129,7 +145,7 @@ export default function Inventory() {
             <Upload className="h-4 w-4" /> {isImporting ? 'Importing...' : 'Import Excel'}
           </Button>
           
-          <Dialog>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger render={<Button className="gap-2 bg-[#0f172a] hover:bg-[#1e293b]" />}>
               <Plus className="h-4 w-4" /> Add Product
             </DialogTrigger>
@@ -141,6 +157,26 @@ export default function Inventory() {
                 <div className="space-y-2 col-span-2">
                   <label className="text-sm font-medium">Product Name</label>
                   <Input value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} placeholder="e.g. White Marble Tile" />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <label className="text-sm font-medium">Barcode (Optional)</label>
+                  <div className="flex gap-2">
+                    <Input value={newProduct.barcode} onChange={e => setNewProduct({...newProduct, barcode: e.target.value})} placeholder="Scan or type barcode" />
+                    <Button type="button" variant="outline" onClick={() => setIsScanning(true)}>
+                      <ScanLine className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {isScanning && (
+                    <div className="mt-2">
+                      <BarcodeScanner 
+                        onScan={(text) => {
+                          setNewProduct({...newProduct, barcode: text});
+                          setIsScanning(false);
+                        }} 
+                        onClose={() => setIsScanning(false)} 
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Category</label>

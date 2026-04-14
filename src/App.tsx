@@ -38,7 +38,7 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/20">M</div>
                 <div>
-                  <h1 className="font-bold text-lg tracking-tight leading-none">mavxon ERP</h1>
+                  <h1 className="font-bold text-lg tracking-tight leading-none">mavxon EIMS</h1>
                   <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">Enterprise Pro</p>
                 </div>
               </div>

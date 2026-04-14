@@ -1,19 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, FileText, Printer, Plus, Calculator, CreditCard, Wallet, Landmark } from 'lucide-react';
+import { Search, FileText, Printer, Plus, Calculator, CreditCard, Wallet, Landmark, ScanLine } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { mockSales, mockProducts } from '../mockData';
+import BarcodeScanner from './BarcodeScanner';
 
 export default function Sales() {
+  const boxesRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const [boxes, setBoxes] = useState<string>('');
   const [pcsPerBox, setPcsPerBox] = useState<string>('');
   const [sftPerPc, setSftPerPc] = useState<string>('3.875'); // Default example factor
   const [totalSft, setTotalSft] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Bkash' | 'Bank'>('Cash');
   const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [selectedProductId, setSelectedProductId] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
   const [sales, setSales] = useState<any[]>([]);
@@ -68,6 +72,7 @@ export default function Sales() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer_name: customerName,
+          customer_phone: customerPhone,
           total_amount: totalAmount,
           discount: 0,
           paid_amount: isDraft ? 0 : totalAmount,
@@ -92,6 +97,7 @@ export default function Sales() {
         fetchSales();
         // Reset form
         setCustomerName('');
+        setCustomerPhone('');
         setSelectedProductId('');
         setBoxes('');
         setPcsPerBox('');
@@ -112,6 +118,21 @@ export default function Sales() {
   const handleExport = () => {
     const date = new Date().toISOString().split('T')[0];
     window.location.href = `/api/export/sales?date=${date}`;
+  };
+
+  const handleScan = (decodedText: string) => {
+    const product = products.find(p => p.barcode === decodedText);
+    if (product) {
+      setSelectedProductId(product.id.toString());
+      setPcsPerBox(product.pcs_per_box?.toString() || '1');
+      setIsScanning(false);
+      // Focus the boxes input after a short delay to allow React to render
+      setTimeout(() => {
+        boxesRef.current?.focus();
+      }, 100);
+    } else {
+      alert(`Product not found for barcode: ${decodedText}`);
+    }
   };
 
   return (
@@ -143,7 +164,7 @@ export default function Sales() {
               
               <div className="grid gap-6 py-4">
                 {/* Product Selection */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Customer Name</label>
                     <Input 
@@ -153,19 +174,38 @@ export default function Sales() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">Customer Phone</label>
+                    <Input 
+                      placeholder="e.g. +8801..." 
+                      value={customerPhone}
+                      onChange={e => setCustomerPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Select Product</label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      value={selectedProductId}
-                      onChange={e => setSelectedProductId(e.target.value)}
-                    >
-                      <option value="">-- Search/Select Product --</option>
-                      {products.map(p => (
-                        <option key={p.id} value={p.id}>{p.name} ({p.size})</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        value={selectedProductId}
+                        onChange={e => setSelectedProductId(e.target.value)}
+                      >
+                        <option value="">-- Search/Select Product --</option>
+                        {products.map(p => (
+                          <option key={p.id} value={p.id}>{p.name} ({p.size})</option>
+                        ))}
+                      </select>
+                      <Button type="button" variant="outline" onClick={() => setIsScanning(true)} title="Scan Barcode">
+                        <ScanLine className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
+
+                {isScanning && (
+                  <div className="bg-slate-50 p-4 rounded-xl border">
+                    <BarcodeScanner onScan={handleScan} onClose={() => setIsScanning(false)} />
+                  </div>
+                )}
 
                 {/* Calculator Section */}
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
@@ -174,6 +214,7 @@ export default function Sales() {
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-600">Boxes</label>
                       <Input 
+                        ref={boxesRef}
                         type="number" 
                         placeholder="0" 
                         value={boxes}
